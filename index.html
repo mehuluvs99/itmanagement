@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta name="x-poe-datastore-behavior" content="local_only">
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://code.jquery.com https://unpkg.com https://d3js.org https://threejs.org https://cdn.plot.ly https://stackpath.bootstrapcdn.com https://maps.googleapis.com https://cdn.tailwindcss.com https://ajax.googleapis.com https://kit.fontawesome.com https://cdn.datatables.net https://maxcdn.bootstrapcdn.com https://code.highcharts.com https://tako-static-assets-production.s3.amazonaws.com https://www.youtube.com https://fonts.googleapis.com https://fonts.gstatic.com https://pfst.cf2.poecdn.net https://puc.poecdn.net https://i.imgur.com https://wikimedia.org https://*.icons8.com https://*.giphy.com https://picsum.photos https://images.unsplash.com; connect-src 'self' https://script.google.com; frame-src 'self' https://www.youtube.com https://trytako.com; child-src 'self'; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests; block-all-mixed-content;">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IT Asset Management</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: '#5D5CDE',
+            'primary-dark': '#4B4BC9'
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .fade-in {
+      animation: fadeIn 0.3s ease-in;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .slide-in {
+      animation: slideIn 0.3s ease-out;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(-100%);
+      }
+
+      to {
+        transform: translateX(0);
+      }
+    }
+  </style>
+  <script src="https://puc.poecdn.net/authenticated_preview_page/syncedState.bd4eeeb8e8e02052ee92.js"></script>
+</head>
+
+<body class="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen">
+  <!-- Navigation -->
+  <nav class="bg-primary dark:bg-primary-dark shadow-lg">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between h-16">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <h1 class="text-xl font-bold text-white">IT Asset Manager</h1>
+          </div>
+          <div class="hidden md:block">
+            <div class="ml-10 flex items-baseline space-x-4">
+              <button onclick="showView('dashboard')"
+                class="nav-btn text-white hover:bg-white hover:bg-opacity-10 px-3 py-2 rounded-md text-sm font-medium transition-colors">Dashboard</button>
+              <button onclick="showView('assets')"
+                class="nav-btn text-white hover:bg-white hover:bg-opacity-10 px-3 py-2 rounded-md text-sm font-medium transition-colors">Assets</button>
+              <button onclick="showView('add-asset')"
+                class="nav-btn text-white hover:bg-white hover:bg-opacity-10 px-3 py-2 rounded-md text-sm font-medium transition-colors">Add
+                Asset</button>
+            </div>
+          </div>
+        </div>
+        <div class="md:hidden">
+          <button onclick="toggleMobileMenu()" class="text-white hover:bg-white hover:bg-opacity-10 p-2 rounded-md">
+            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+    <!-- Mobile menu -->
+    <div id="mobile-menu" class="md:hidden hidden">
+      <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-primary-dark">
+        <button onclick="showView('dashboard'); toggleMobileMenu()"
+          class="block text-white hover:bg-white hover:bg-opacity-10 px-3 py-2 rounded-md text-base font-medium w-full text-left">Dashboard</button>
+        <button onclick="showView('assets'); toggleMobileMenu()"
+          class="block text-white hover:bg-white hover:bg-opacity-10 px-3 py-2 rounded-md text-base font-medium w-full text-left">Assets</button>
+        <button onclick="showView('add-asset'); toggleMobileMenu()"
+          class="block text-white hover:bg-white hover:bg-opacity-10 px-3 py-2 rounded-md text-base font-medium w-full text-left">Add
+          Asset</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+    <!-- Dashboard View -->
+    <div id="dashboard-view" class="view fade-in">
+      <div class="mb-8">
+        <h2 class="text-3xl font-bold text-gray-900 dark:text-white">Dashboard</h2>
+        <p class="mt-2 text-gray-600 dark:text-gray-400">Overview of your IT assets</p>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg shadow-sm">
+          <div class="flex items-center">
+            <div class="p-2 bg-primary bg-opacity-10 rounded-lg">
+              <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z">
+                </path>
+              </svg>
+            </div>
+            <div class="ml-4">
+              <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Assets</p>
+              <p id="total-assets" class="text-2xl font-bold text-gray-900 dark:text-white">0</p>
+            </div>
+          </div>
+        </div>
+        <div class="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg shadow-sm">
+          <div class="flex items-center">
+            <div class="p-2 bg-green-100 dark:bg-green-900 rounded-lg">
+              <svg class="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <div class="ml-4">
+              <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Active</p>
+              <p id="active-assets" class="text-2xl font-bold text-gray-900 dark:text-white">0</p>
+            </div>
+          </div>
+        </div>
+        <div class="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg shadow-sm">
+          <div class="flex items-center">
+            <div class="p-2 bg-yellow-100 dark:bg-yellow-900 rounded-lg">
+              <svg class="w-6 h-6 text-yellow-600 dark:text-yellow-400" fill="none" stroke="currentColor"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z">
+                </path>
+              </svg>
+            </div>
+            <div class="ml-4">
+              <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Maintenance</p>
+              <p id="maintenance-assets" class="text-2xl font-bold text-gray-900 dark:text-white">0</p>
+            </div>
+          </div>
+        </div>
+        <div class="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg shadow-sm">
+          <div class="flex items-center">
+            <div class="p-2 bg-red-100 dark:bg-red-900 rounded-lg">
+              <svg class="w-6 h-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <div class="ml-4">
+              <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Retired</p>
+              <p id="retired-assets" class="text-2xl font-bold text-gray-900 dark:text-white">0</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="bg-gray-50 dark:bg-gray-800 rounded-lg shadow-sm p-6">
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Recent Assets</h3>
+        <div id="recent-assets" class="space-y-3">
+          <p class="text-gray-500 dark:text-gray-400">No assets added yet.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Assets View -->
+    <div id="assets-view" class="view hidden">
+      <div class="mb-8">
+        <h2 class="text-3xl font-bold text-gray-900 dark:text-white">Assets</h2>
+        <p class="mt-2 text-gray-600 dark:text-gray-400">Manage your IT assets</p>
+      </div>
+      <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg mb-6">
+        <div class="flex flex-col sm:flex-row gap-4">
+          <div class="flex-1">
+            <input type="text" id="search-input" placeholder="Search assets..."
+              class="w-full px-4 py-2 text-base border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+          </div>
+          <div class="flex gap-2">
+            <select id="category-filter"
+              class="px-4 py-2 text-base border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+              <option value="">All Categories</option>
+              <option value="Hardware">Hardware</option>
+              <option value="Software">Software</option>
+              <option value="Network">Network</option>
+              <option value="Mobile">Mobile</option>
+              <option value="Other">Other</option>
+            </select>
+            <select id="status-filter"
+              class="px-4 py-2 text-base border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+              <option value="">All Status</option>
+              <option value="Active">Active</option>
+              <option value="Maintenance">Maintenance</option>
+              <option value="Retired">Retired</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead class="bg-gray-50 dark:bg-gray-700">
+              <tr>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  Asset</th>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  Category</th>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  Status</th>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  Location</th>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  Purchase Date</th>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  Actions</th>
+              </tr>
+            </thead>
+            <tbody id="assets-table-body"
+              class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700"></tbody>
+          </table>
+        </div>
+        <div id="no-assets" class="p-8 text-center text-gray-500 dark:text-gray-400 hidden">
+          <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2 2v-5m16 0h-2M4 13h2m-2 0v6m16-6v6M8 21l4-3 4 3">
+            </path>
+          </svg>
+          <h3 class="mt-2 text-sm font-medium">No assets found</h3>
+          <p class="mt-1 text-sm">Get started by adding a new asset.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add Asset View -->
+    <div id="add-asset-view" class="view hidden">
+      <div class="mb-8">
+        <h2 class="text-3xl font-bold text-gray-900 dark:text-white">Add New Asset</h2>
+        <p class="mt-2 text-gray-600 dark:text-gray-400">Register a new IT asset</p>
+      </div>
+      <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6">
+        <form id="asset-form" class="space-y-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label for="asset-name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Asset Name
+                *</label>
+              <input type="text" id="asset-name" required=""
+                class="w-full px-4 py-2 text-base border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+            </div>
+            <div>
+              <label for="asset-tag" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Asset
+                Tag</label>
+              <input type="text" id="asset-tag"
+                class="w-full px-4 py-2 text-base border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+            </div>
+            <div>
+              <label for="asset-category"
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Category *</label>
+              <select id="asset-category" required=""
+                class="w-full px-4 py-2 text-base border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                <option value="">Select Category</option>
+                <option value="Hardware">Hardware</option>
+                <option value="Software">Software</option>
+                <option value="Network">Network</option>
+                <option value="Mobile">Mobile</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div>
+              <label for="asset-status" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Status
+                *</label>
+              <select id="asset-status" required=""
+                class="w-full px-4 py-2 text-base border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                <option value="">Select Status</option>
+                <option value="Active">Active</option>
+                <option value="Maintenance">Maintenance</option>
+                <option value="Retired">Retired</option>
+              </select>
+            </div>
+            <div>
+              <label for="asset-manufacturer"
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Manufacturer</label>
+              <input type="text" id="asset-manufacturer"
+                class="w-full px-4 py-2 text-base border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+            </div>
+            <div>
+              <label for="asset-model"
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Model</label>
+              <input type="text" id="asset-model"
+                class="w-full px-4 py-2 text-base border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+            </div>
+            <div>
+              <label for="asset-serial" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Serial
+                Number</label>
+              <input type="text" id="asset-serial"
+                class="w-full px-4 py-2 text-base border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+            </div>
+            <div>
+              <label for="asset-location"
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Location</label>
+              <input type="text" id="asset-location"
+                class="w-full px-4 py-2 text-base border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+            </div>
+            <div>
+              <label for="asset-purchase-date"
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Purchase Date</label>
+              <input type="date" id="asset-purchase-date"
+                class="w-full px-4 py-2 text-base border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+            </div>
+            <div>
+              <label for="asset-cost" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Purchase
+                Cost</label>
+              <input type="number" id="asset-cost" step="0.01"
+                class="w-full px-4 py-2 text-base border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+            </div>
+            <div>
+              <label for="asset-warranty"
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Warranty Expiry</label>
+              <input type="date" id="asset-warranty"
+                class="w-full px-4 py-2 text-base border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+            </div>
+            <div>
+              <label for="asset-assignee"
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Assigned To</label>
+              <input type="text" id="asset-assignee"
+                class="w-full px-4 py-2 text-base border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+            </div>
+          </div>
+          <div>
+            <label for="asset-notes"
+              class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Notes</label>
+            <textarea id="asset-notes" rows="3"
+              class="w-full px-4 py-2 text-base border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"></textarea>
+          </div>
+          <div class="flex gap-4">
+            <button type="submit"
+              class="bg-primary hover:bg-primary-dark text-white font-medium py-2 px-6 rounded-lg transition-colors">
+              <span id="form-submit-text">Add Asset</span>
+            </button>
+            <button type="button" onclick="cancelForm()"
+              class="bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-6 rounded-lg transition-colors">
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <!-- Modal for Asset Details -->
+  <div id="asset-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+      <div class="p-6">
+        <div class="flex justify-between items-start mb-4">
+          <h3 class="text-lg font-medium text-gray-900 dark:text-white">Asset Details</h3>
+          <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+        <div id="modal-content"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+
+</html>
